@@ -33,11 +33,11 @@ Assume the reader understands ML and CV, but doesn't know this task
 
 \section{Dataset Overview}
 
-The VOC2012 combined training and validation data sets contain 11,540 images and their associated annotations. For the purposes of our project, we have used the training and validation sets provided by VOC2012 as the full data set. The images are of objects identified as one of 20 classes. Images may contain more than one identified object. 
+The VOC2012 combined training and validation data sets contain 11,540 images and their associated annotations. For the purposes of our project, we have used the training and validation sets provided by VOC2012 as the full data set and made our own partition of the data as discussed below in the Methodology. The images all contain at least one object that is identified as one of 20 classes. Images may contain more than one identified object. 
 
-The images are provided as jpeg files. The annotations are provided in XML format. Each annotation contains information about the size of the image (height, width, number of channels), each identified object within the image and the bounding box of the object, defined by the coordinates of the four corners of the box (xmin, xmax, ymin, ymax). Listing 1 gives an example of the format of the annotation information.
+The images are provided as jpeg files. The annotations are provided in XML format. Each annotation contains information about the size of the image (height, width, number of channels), as well as the class and bounding box of each identified object within the image. The bounding boxes of the objects are defined by the coordinates of the four corners of the box (xmin, xmax, ymin, ymax). Listing \ref{lst:label} gives an example of the format of the annotation information.
 
-\begin{lstlisting}[language=XML, caption=Annotation example]
+\begin{lstlisting}[language=XML, label={lst:label}, caption=Annotation example]
 <annotation>
 	<folder>VOC2012</folder>
 	<filename>2007_000027.jpg</filename>
@@ -68,39 +68,53 @@ The images are provided as jpeg files. The annotations are provided in XML forma
 
 \end{lstlisting}
 
-We have split the data into training, validation and test sets, using an approximately 70/15/15 split. The distributions of images and objects by class are approximately equal across the training, validation and test sets.
 
 \textbf{Distribution of objects across the classes:}
 
-Taking the label of the first object listed in the data set for each image as the 'primiary object' of the image, the distribution of these primary objects is unequal across the classes. As the following bar chart shows, 'person' is the most common primary object for an image, followed by 'dog' and 'cat'; 'dining table' is the least frequent primary object. As a \% of total images, their relative frequency ranges from 16.9\% for 'person' to 2.0\% for 'dining table.
+Taking the label of the first object listed in the annotation file for each image as the 'primary object' of the image, the distribution of these primary objects is not across the classes. Figure \ref{fig:image_by_class} shows that 'person' is the most common primary object for an image, followed by 'dog' and 'cat'; 'dining table' is the least frequent primary object. As a \% of total images, their relative frequency ranges from 16.9\% for 'person' to 2.0\% for 'dining table. The full breakdown of the primary object by class for the training, validation and development sets is given in Figure \ref{fig:data_overview} in the Appendix.
 
-\includegraphics[scale = 0.7]{bar_channels.jpg}
-
-The full breakdown of the primary object by class for the training, validation and development sets is given in the following table [Note: should move to appendix]
-
-\includegraphics[scale = 0.5]{table_channels.jpg}
+\begin{figure}[h]
+  \includegraphics[scale = 0.7]{bar_channels.jpg}
+  \centering
+  \caption{Distribution of Images by Primary Object Class}
+  \label{fig:image_by_class}
+\end{figure}
 
 
 \textbf{The number of objects in each image:}
 
-The images in the data set contain a variable number of located objects per image. The following chart summarises the distribution of the number of objects per image in the data set:
+The images in the data set contain a variable number of located objects per image. The most common number of objects in an image is 1. However, 52\% of images have 2 or more objects identified and the maximum number of objects identified in an image is 39. Figure \ref{fig:objects_by_image} summarises the distribution of the number of objects per image in the data set:
 
-\includegraphics[scale = 0.7]{hist_objects.jpg}
-
-The most common number of objects in an image is 1. However, x\% of images have 2 or more objects identified and the maximum number of objects identified in an image is 39.
+\begin{figure}[h]
+  \includegraphics[scale = 0.7]{hist_objects.jpg}
+  \centering
+  \caption{Distribution of Number of Objects per Image}
+  \label{fig:objects_by_image}
+\end{figure}
 
 
 \textbf{Image sizes:}
 
-The images are different sizes and aspect ratios - 772 unique image sizes occur in the data set. Typically a pre-trained model will expect images to be resized to a specific size as input to the model (e.g. the resnet50 model expects images of size 224 x 224). Image resizing was therefore required in pre-processing. Standard resizing functions such as img_load_img in keras do not maintain the aspect ratio of the original image, it is 'squished' down to size. This is noted as a potential factor in the relative performance of the model on some images vs. others. The following chart shows the frequency of the top 10 most frequent image sizes. Approximately 40\% of the images are 500 x 375 and there is a long tail of different sizes.
+The images are different sizes and aspect ratios: 772 unique image sizes occur in the data set. Typically a pre-trained model will expect images to be resized to a specific size as input to the model (For example, the resnet50 model expects images of size 224 x 224). Image resizing functions such as \lstinline{img_load_img} in keras do not maintain the aspect ratio of the original image, it is 'squished' down to size. This is noted as a potential factor in the relative performance of the model on some images vs. others. Figure \ref{fig:objects_by_image} shows the frequency of the top 10 most frequent image sizes. Approximately 40\% of the images are 500 x 375 but there is a long tail of image sizes.
 
-\includegraphics[scale = 0.7]{aspect_ratio.jpg}
+\begin{figure}[h]
+  \includegraphics[scale = 0.7]{aspect_ratio.jpg}
+  \centering
+  \caption{Top 10 most Frequent Image Sizes}
+  \label{fig:aspect_ratios}
+\end{figure}
 
 \textbf{Bounding boxes:}
 
-The bounding box provided for each object describes the coordinate of four corners of a rectangle that surrounds the object. Two examples of images and their bounding boxes are as follows. It can be seen from these illustrations that the bounding boxes may overlap.
+The bounding box provided for each object describes the coordinate of four corners of a rectangle that surrounds the object. An annotated image contains a bounding box drawn around each identified object, and the label of the class of that object associated with the box. Figure \ref{fig:bounding_boxes} illustrates that the bounding boxes may overlap.
 
-\includegraphics[scale = 0.3]{bbox_example.png}
+\begin{figure}[h]
+  \includegraphics[scale = 0.3]{bbox_example.png}
+  \centering
+  \caption{An Example of an Annotated Image}
+  \label{fig:bounding_boxes}
+\end{figure}
+
 
 \section{Methodology}
 
@@ -155,5 +169,13 @@ some models may require more compute power than we have
 Discussion of ways to improve the work in the future:
 
 - example (if relevant to the Faster R-CNN and Yolo) - rather than using default resizig, rescaling along the longest size and maintaining the aspect radio and padding the remainder of the image may be a better approach to improve performance in the models.
+
+\section{Appendix}
+\begin{figure}[h]
+  \includegraphics[scale = 0.5]{df_styled.jpg}
+  \centering
+  \caption{Distribution of Images by train, val, test by Class}
+  \label{fig:data_overview}
+\end{figure}
 
 \end{document}
