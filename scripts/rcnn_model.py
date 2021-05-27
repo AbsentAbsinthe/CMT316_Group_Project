@@ -10,20 +10,19 @@ train_images_path = "CMT316_Group_Project/images/train/"
 test_images_path = "CMT316_Group_Project/images/test/"
 train_labels_path = "CMT316_Group_Project/labels_csv/df_labels_train.csv"
 model = torchvision.models.detection.fasterrcnn_resnet50_fpn()
-# For training
+
+# Image Preprocessing
 model.train()
 train_images = []
 for image in os.listdir(train_images_path):
     img = cv2.imread(train_images_path + image)
     trans = transforms.Compose([transforms.ToTensor()])
     norm_img = trans(img)
-    #mean, std = img.mean([1,2]), img.std([1,2])
-    #img = torchvision.transforms.Normalize(img)
-    #img = img.unsqueeze(1) 4D Tensor
     train_images.append(norm_img)
 
 print('Image Preprocessing Complete...')
 
+# Label Preprocessing 
 reader = csv.reader(open(train_labels_path, 'r'))
 labels_in = list(reader)
 label_lists = []
@@ -49,6 +48,7 @@ for label in labels_in[1:]:
 
 print('Label Preprocessing Complete...')
 
+# Model Training
 targets = []
 for i in range(len(train_images)):
     d = {}
@@ -58,7 +58,8 @@ for i in range(len(train_images)):
 output = model(train_images, targets)
 
 print('Training Complete...')
-# For inference
+
+# Model Evaluation and Predictions
 model.eval()
 test_images = []
 for image in os.listdir(test_images_path):
