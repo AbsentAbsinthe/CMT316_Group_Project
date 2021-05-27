@@ -1,7 +1,11 @@
 import torchvision
 import torch
 import os
+import sys
 import csv
+import cv2
+from torchvision import transforms
+
 train_images_path = "CMT316_Group_Project/images/train/"
 test_images_path = "CMT316_Group_Project/images/test/"
 train_labels_path = "CMT316_Group_Project/labels_csv/df_labels_train.csv"
@@ -10,17 +14,25 @@ model = torchvision.models.detection.fasterrcnn_resnet50_fpn()
 model.train()
 train_images = []
 for image in os.listdir(train_images_path):
-    img = torchvision.io.read_image(train_images_path + image)
+    img = cv2.imread(train_images_path + image)
+    trans = transforms.Compose([transforms.ToTensor()])
+    norm_img = trans(img)
+    #mean, std = img.mean([1,2]), img.std([1,2])
+    #img = torchvision.transforms.Normalize(img)
     #img = img.unsqueeze(1) 4D Tensor
-    train_images.append(img)
+    train_images.append(norm_img)
+
+print('Image Preprocessing Complete...')
 
 reader = csv.reader(open(train_labels_path, 'r'))
 labels_in = list(reader)
 label_lists = []
 for label in labels_in[1:]:
-    boxes = []
-    labels = []
+    all_boxes = []
+    all_labels = []
     for coords in range(2,len(label),5):
+        boxes = []
+        labels = []
         if len(label[coords:]) > 4:
             if len(label[coords]) > 0 and len(label[coords+1]) > 0 and len(label[coords+2]) > 0 and len(label[coords+3]) > 0 and len(label[coords+ 4]) > 0:
                 labels.append(float(label[coords]))
@@ -28,8 +40,15 @@ for label in labels_in[1:]:
                 boxes.append(float(label[coords + 2]))
                 boxes.append((float(label[coords + 1]) + float(label[coords + 3])))
                 boxes.append((float(label[coords + 2]) + float(label[coords + 4])))
-    label_lists.append([torch.tensor(boxes),torch.tensor(labels)])
-print(label_lists[1])
+        if len(boxes) != 0:
+            all_boxes.append(boxes)
+            all_labels.append(labels)
+    box_tensors = torch.tensor(all_boxes)
+    label_tensors = torch.tensor(all_labels)
+    label_lists.append([box_tensors,label_tensors])
+
+print('Label Preprocessing Complete...')
+
 targets = []
 for i in range(len(train_images)):
     d = {}
@@ -37,6 +56,8 @@ for i in range(len(train_images)):
     d['labels'] = label_lists[i][1]
     targets.append(d)
 output = model(train_images, targets)
+
+print('Training Complete...')
 # For inference
 model.eval()
 test_images = []
@@ -44,3 +65,4 @@ for image in os.listdir(test_images_path):
     img = torchvision.io.read_image(test_images_path + image)
     test_images.append(img)
 predictions = model(test_images)
+print('Predictions Complete...')
