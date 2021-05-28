@@ -6,9 +6,9 @@ import csv
 import cv2
 from torchvision import transforms
 
-train_images_path = "CMT316_Group_Project/images/train/"
-test_images_path = "CMT316_Group_Project/images/test/"
-train_labels_path = "CMT316_Group_Project/labels_csv/df_labels_train.csv"
+train_images_path = "images/train/"
+test_images_path = "images/test/"
+train_labels_path = "labels_csv/df_labels_train.csv"
 model = torchvision.models.detection.fasterrcnn_resnet50_fpn()
 
 # Image Preprocessing
