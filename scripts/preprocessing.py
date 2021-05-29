@@ -57,8 +57,8 @@ def label_dataframe(lab_dir):
 df_labels_train = label_dataframe(str(lab_dir)+'train/')
 df_labels_train.to_csv(str(lab_dir_csv)+'df_labels_train.csv')
 
-df_labels_val = label_dataframe(str(lab_dir)+'test/')
+df_labels_val = label_dataframe(str(lab_dir)+'val/')
 df_labels_val.to_csv(str(lab_dir_csv)+'df_labels_val.csv')
 
-df_labels_test = label_dataframe(str(lab_dir)+'val/')
+df_labels_test = label_dataframe(str(lab_dir)+'test/')
 df_labels_test.to_csv(str(lab_dir_csv)+'df_labels_test.csv')
