@@ -1,7 +1,7 @@
 # CMT316_Group_Project
 CMT316 Group Project: Object localisation CV4
 
-Authors: Edward Parkinson, Iwan Munro, Lewis Hemming, Meghana Reddy Anugu, Shaoshi Sun & Sreekar Chittajallu
+Authors: Edward Parkinson, Iwan Munro, Lewis Hemming & Shaoshi Sun
 
 It is straightforward for people to locate objects in an image, but can you develop a system to learn to do this? 
 Given an image, this project aims to find all the instances of relevant objects (as bounding boxes) with labels. 
